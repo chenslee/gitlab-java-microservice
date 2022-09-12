@@ -14,10 +14,10 @@ jobs:
       packages: write
       contents: read
 
-    steps:
-      - env:
-          IMAGE_ID: ghcr.io/$OWNER/gitlab-java-microservice
+    env:
+      IMAGE_ID: ghcr.io/cta800/gitlab-java-microservice
 
+    steps:
       - uses: actions/checkout@v2
 
       - name: Create build timestamp
