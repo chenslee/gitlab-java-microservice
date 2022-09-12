@@ -1,0 +1,79 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Users
+  description: For obtaining information about users
+paths:
+  /api/v1/users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Fetch public information for the specified user.
+      operationId: getUsers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful retrieval of a user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /api/v1/users/{id}/repos:
+    get:
+      tags:
+      - Users
+      summary: Fetch public repositories for the specified user.
+      operationId: getRepos
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful retrieval of repositories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Repository'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+    Repository:
+      type: object
+      properties:
+        ssh_url_to_repo:
+          type: string
+        http_url_to_repo:
+          type: string
+        name:
+          type: string
+        id:
+          type: integer
+          format: int64

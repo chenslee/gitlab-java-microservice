@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - 'main'
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create build timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date "+%Y%m%d.%H%M")"
+
+      - name: Build Container Image
+        run: docker build . -t gitlab-java-microservice:latest -t gitlab-java-microservice:${{ steps.timestamp.outputs.timestamp }}
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
+        run: docker push gitlab-java-microservice --all-tags
+
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.timestamp.outputs.timestamp }}',
+              sha: context.sha
+            })

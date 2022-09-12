@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "org.springdoc.openapi-gradle-plugin" version "1.3.4"
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+    mavenLocal()
+}
+
+project.version = '1.0.0'
+
+dependencies {
+    // This dependency is used by the application.
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation('commons-validator:commons-validator:1.7')
+
+    // Unit Test Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
+    outputDir.set(file("${project.rootDir}/openapi"))
+    outputFileName.set("openapi.yaml")
+    waitTimeInSeconds.set(30)
+}
+
+// The generateOpenApiDocs will not replace the file if it already exists.  Force delete prior
+// to generating to ensure new file is generated.
+task cleanOpenApi(type: Delete) {
+    delete file("${project.rootDir}/openapi")
+}
+
+afterEvaluate() {
+    generateOpenApiDocs.dependsOn cleanOpenApi
+}
+
+// The generateOpenApiDocs task works by running the spring boot application using the "bootRun"
+// task.  This has several side effects that need to be handled in order to ensure successfully
+// task completion
+if ( project.gradle.startParameter.taskNames.contains("generateOpenApiDocs") ) {
+    bootRun.systemProperties.put("ON_BOOT_METRICS", "false")
+}
+
+test {
+    useJUnitPlatform()
+    if("integration" == project.findProperty("test-type")) {
+        filter.includeTestsMatching "com.chenslee.gitlab.integration.*"
+    }
+    else {
+        filter.excludeTestsMatching "com.chenslee.gitlab.integration.*"
+    }
+}
+
+bootJar {
+    archiveFileName = "gitlab-java-microservice.jar"
+    manifest {
+        attributes('Implementation-Version': project.version)
+    }
+}
+
+bootRun {
+    systemProperty 'project.version', project.version
+}

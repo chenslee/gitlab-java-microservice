@@ -1,0 +1,57 @@
+name: Pull Request Validations
+
+on:
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and Unit Test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: ./.github/actions/gradle-cache
+      - name: Build and Unit Test
+        run: ./gradlew assemble test --no-daemon
+      - name: Build Container Image
+        run: |
+          docker build . -t gitlab-java-microservice:latest
+
+# TODO
+#  verify-code-format:
+#    name: Verify Code Format
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#      - uses: ./.github/actions/gradle-cache
+#      - name: Verify Code Format
+#        run: |
+#          # Run the spotless formatter.
+#          ./gradlew spotlessApply
+#          # Make sure no files changed as a result of the formatter application.
+#          git diff --exit-code --quiet
+
+  verify-openapi:
+    name: Verify OpenApi Is Up To Date
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: ./.github/actions/gradle-cache
+      - name: Verify OpenApi Is Up To Date
+        run: |
+          ./gradlew generateOpenApiDocs --no-daemon
+          if ! $(git diff --exit-code --quiet openapi/openapi.yaml); then
+            echo "OpenApi docs are not up to date. Please run './gradlew generateOpenApiDocs' and commit the latest Open API YAML file."
+            exit 1
+          fi
