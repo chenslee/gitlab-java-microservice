@@ -15,7 +15,7 @@ jobs:
       contents: read
 
     env:
-      IMAGE_ID: ghcr.io/$OWNER/gitlab-java-microservice
+      IMAGE_ID: ghcr.io/cta800/gitlab-java-microservice
 
     steps:
       - uses: actions/checkout@v2
