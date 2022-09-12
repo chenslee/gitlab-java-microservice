@@ -4,6 +4,8 @@ This project is an example java microservice to showcase general java skills.  I
 API for obtaining public project information for a user from GitLab.  This project is extremely basic
 and is only intended to give a brief overview of several functions.
 
+[![Release](https://github.com/cta800/gitlab-java-microservice/actions/workflows/release.yaml/badge.svg)](https://github.com/cta800/gitlab-java-microservice/actions/workflows/release.yaml)
+
 # Building
 This project builds using `gradle`.  To build the project, simply run `./gradlew build`.
 

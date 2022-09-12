@@ -21,16 +21,6 @@ jobs:
         id: timestamp
         run: echo "::set-output name=timestamp::$(date "+%Y%m%d.%H%M")"
 
-      - name: Collect image metadata
-        id: image
-        env:
-          IMAGE_ID: epa-github-kpi-service
-        run: |
-          OWNER=$(echo ${{ github.repository_owner }} | tr '[A-Z]' '[a-z]')
-          echo "::set-output name=image::ghcr.io/$OWNER/$IMAGE_ID"
-          echo "::set-output name=timestamp_tag::ghcr.io/$OWNER/$IMAGE_ID:${{ steps.timestamp.outputs.timestamp }}"
-          echo "::set-output name=latest_tag::ghcr.io/$OWNER/$IMAGE_ID:latest"
-
       - name: Build Container Image
         run: docker build . -t gitlab-java-microservice:latest -t gitlab-java-microservice:${{ steps.timestamp.outputs.timestamp }}
 
@@ -38,7 +28,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Push image
-        run: docker push ${{ steps.image.outputs.image }} --all-tags
+        run: docker push gitlab-java-microservice --all-tags
 
       - name: Create tag
         uses: actions/github-script@v5
