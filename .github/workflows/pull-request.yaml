@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/actions/gradle-cache/action.yaml
+      - uses: ./.github/actions/gradle-cache/action.yaml
       - name: Build and Unit Test
         run: ./gradlew assemble test --no-daemon
       - name: Build Container Image
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/actions/gradle-cache/action.yaml
+      - uses: ./.github/actions/gradle-cache/action.yaml
       - name: Verify Code Format
         run: |
           # Run the spotless formatter.
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/actions/gradle-cache/action.yaml
+      - uses: ./.github/actions/gradle-cache/action.yaml
       - name: Verify OpenApi Is Up To Date
         run: |
           ./gradlew generateOpenApiDocs --no-daemon
