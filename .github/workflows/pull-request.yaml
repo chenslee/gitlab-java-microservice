@@ -8,6 +8,8 @@ jobs:
     name: Build and Unit Test
     runs-on: ubuntu-22.04
     steps:
+      - env:
+          IMAGE_ID: ghcr.io/$OWNER/gitlab-java-microservice
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v3
         with:
@@ -18,7 +20,7 @@ jobs:
         run: ./gradlew assemble test --no-daemon
       - name: Build Container Image
         run: |
-          docker build . -t gitlab-java-microservice:latest
+          docker build . -t $IMAGE_ID:latest
 
 # TODO
 #  verify-code-format:

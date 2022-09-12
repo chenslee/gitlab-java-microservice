@@ -15,6 +15,9 @@ jobs:
       contents: read
 
     steps:
+      - env:
+          IMAGE_ID: ghcr.io/$OWNER/gitlab-java-microservice
+
       - uses: actions/checkout@v2
 
       - name: Create build timestamp
@@ -22,13 +25,13 @@ jobs:
         run: echo "::set-output name=timestamp::$(date "+%Y%m%d.%H%M")"
 
       - name: Build Container Image
-        run: docker build . -t gitlab-java-microservice:latest -t gitlab-java-microservice:${{ steps.timestamp.outputs.timestamp }}
+        run: docker build . -t $IMAGE_ID:latest -t $IMAGE_ID:${{ steps.timestamp.outputs.timestamp }}
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Push image
-        run: docker push gitlab-java-microservice --all-tags
+        run: docker push $IMAGE_ID --all-tags
 
       - name: Create tag
         uses: actions/github-script@v5
